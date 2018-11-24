@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1543010172356.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "8A6AA1AB",
+    "lastKnownWriteTime" : 1543011826,
+    "last_content_update" : 1543031082798,
+    "path" : "~/MIT/Research/Oman/bin/2018-11-23/feature_distributions.Rmd",
+    "project_path" : "bin/2018-11-23/feature_distributions.Rmd",
+    "properties" : {
+        "cursorPosition" : "55,0",
+        "scrollLine" : "48",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

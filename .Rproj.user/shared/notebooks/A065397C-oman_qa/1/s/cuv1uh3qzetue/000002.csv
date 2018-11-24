@@ -1,0 +1,4 @@
+"0","intensityTable <- omanFT[,dataCols]"
+"0","x <- sapply(1:ncol(intensityTable), function(x) {"
+"0","    hist(intensityTable[,x], main = colnames(intensityTable)[x], breaks = 250)  "
+"0","}) "

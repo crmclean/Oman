@@ -1,0 +1,58 @@
+---
+title: "Oman Feature Distributions"
+author: "Craig McLean"
+date: "11/23/2018"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(here)
+library(limma)
+library(RColorBrewer)
+```
+
+# Visualizing Features From Data
+
+The goal of this file is to get an idea of how the features are distributed between all 5 samples. 
+
+## Analysis
+
+```{r loading Data}
+omanFT <- read.table(here("data/2018-11-23/QA_oman_feature_table.txt"), header = T,
+                     stringsAsFactors = F)
+dataCols <- 3:7
+```
+
+### Distribution
+
+```{r}
+as.matrix(omanFT[,dataCols]) %>% heatmap(main = "Feature Distribution Between Samples")
+```
+
+From this data, it seems like WAB.71 is the most different, folled by SHQ.14.
+
+```{r}
+overlapTable <- omanFT[,dataCols] %>% apply(2, function(x) {
+    x > 0
+})
+
+vennDiagram(vennCounts(overlapTable), circle.col = brewer.pal(5, "Set1"))
+rm(overlapTable)
+```
+
+The same pattern holds, and is not as big numerically as the heatmap makes it seem.
+
+### Intensity Differences
+
+Get a PCA done here, this will incorporate intensity into the differences.
+
+```{r}
+## also think about pasting mz_rt as single variable.
+
+plot(princomp(omanFT[,dataCols]))
+```
+
+Think about doing some kind of feature selection 
+

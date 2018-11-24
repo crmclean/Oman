@@ -1,0 +1,8 @@
+"0","heat <- omanFT[,dataCols]"
+"0","blankCols <- grep(""blank"", colnames(heat), ignore.case = T)"
+"0","name <- c(""Count"")"
+"0","solvent <- heat[,blankCols[1]] > 0"
+"0","spe <- heat[,blankCols[2]] > 0"
+"0","overlap <- solvent | spe"
+"0","knitr::kable(data.frame(Blank = name, Solvent = sum(solvent), SPE = sum(spe), "
+"0","                        Overlap = sum(overlap), Total = length(spe)))"

@@ -1,0 +1,19 @@
+]0;~/MIT/Research/Oman[?1034hCraigs-MacBook-Pro-2:Oman craigmclean$ [KCraigs-MacBook-Pro-2:Oman craigmclean$ ls
+Oman.Rproj	bin		data		docs		results		scr
+]0;~/MIT/Research/OmanCraigs-MacBook-Pro-2:Oman craigmclean$ source ~/bb[K[K.bp[Kash_profile
+]0;~/MIT/Research/OmanCraigs-MacBook-Pro-2:Oman craigmclean$ mkdaydir 
+]0;~/MIT/Research/OmanCraigs-MacBook-Pro-2:Oman craigmclean$ ls
+2018-11-23	bin		docs		scr
+Oman.Rproj	data		results
+]0;~/MIT/Research/OmanCraigs-MacBook-Pro-2:Oman craigmclean$ mv 2018-11-23/ scr/[K[K[K[Kbin/.
+]0;~/MIT/Research/OmanCraigs-MacBook-Pro-2:Oman craigmclean$ ls
+Oman.Rproj	bin		data		docs		results		scr
+]0;~/MIT/Research/OmanCraigs-MacBook-Pro-2:Oman craigmclean$ ls
+Oman.Rproj	bin		data		docs		results		scr
+]0;~/MIT/Research/OmanCraigs-MacBook-Pro-2:Oman craigmclean$ cd data/
+]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ ls
+2018-11-22
+]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ mkdir [K[K[Kaydir 
+]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ ls
+2018-11-22	2018-11-23
+]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ [KCraigs-MacBook-Pro-2:data craigmclean$ 

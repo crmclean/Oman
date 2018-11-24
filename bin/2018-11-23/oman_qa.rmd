@@ -1,0 +1,158 @@
+---
+title: "QA on Oman Data"
+author: "Craig McLean"
+date: "11/22/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(here)
+```
+
+# Goal
+
+## Reading in Data 
+
+```{r reading in data}
+omanFT <- read.csv(here("data/2018-11-22/OM17 compound_measurements_10k_blanks.csv"), 
+            header = T, 
+            skip = 4)
+metadata <- read.table(here("data/2018-11-22/metadata.txt"), 
+         header = T, sep = " ", stringsAsFactors = F)
+metadata <- metadata[-nrow(metadata),]
+metadata$Sample_Name <- metadata$Sample_Name %>% sub(":", "", .)
+
+dataCols <- list()
+for(i in 1:nrow(metadata)) {
+    dataCols[[i]] <- grep(metadata$Sample_Name[i],colnames(omanFT))[1]
+}
+colnames(omanFT)[c(2,5)] <- c("Neutral_Mass", "Retention_Time")
+omanFT$Retention_Time <- omanFT$Retention_Time * 60
+
+## consider
+omanFT <- omanFT[,c(2,5, unlist(dataCols))]
+dataCols <- grep("XS1", colnames(omanFT))
+colnames(omanFT)[dataCols] <- metadata$Sample_Type[which(metadata$Sample_Name %in% 
+                                                           colnames(omanFT)[dataCols])]
+
+rm(i)
+```
+
+## Checking Skew
+
+I do this to see if the data should be log normalized:
+
+```{r checking for log transform}
+intensityTable <- omanFT[,dataCols]
+
+x <- sapply(1:ncol(intensityTable), function(x) {
+    hist(intensityTable[,x], main = colnames(intensityTable)[x], breaks = 250)  
+}) 
+omanFT[,dataCols] <- log1p(intensityTable)
+rm(x, intensityTable)
+```
+
+The answer is yes, the data is skewed so I should log transform.
+
+## QA Filtering 
+
+### QA Method Selection
+
+Only the blanks are available for filtering since there are no replicates. I need to figure out how I'm going to filter. There are two options:
+
+1) Remove anything that is within a blank from all samples.
+    - Issue: I may be end up removing a large part of the data
+2) Set a fold change filter, saying that I will not remove things that are some fold higher in all samples than in blanks. 
+    - Issue: Ion suppression could make these features appear at higher intensities in blanks versus samples. The converse is true in regards to ion enhancement withtin the samples. 
+
+```{r exploring blank disttribution}
+heat <- omanFT[,dataCols]
+
+blankCols <- grep("blank", colnames(heat), ignore.case = T)
+
+name <- c("Count")
+solvent <- heat[,blankCols[1]] > 0
+spe <- heat[,blankCols[2]] > 0
+overlap <- solvent | spe
+knitr::kable(data.frame(Blank = name, Solvent = sum(solvent), SPE = sum(spe), 
+                        Overlap = sum(overlap), Total = length(spe)))
+heatmap(as.matrix(heat), main = "Distribution of Features Between Samples")
+rm(solvent, spe, overlap, name)
+```
+
+After looking at the data and the feature counts within the blanks, I am going to go with method number 2. The reasons why are:
+
+1) There are a ton of features within the blanks. I worry that if we just eliminate them, we will lose lots of the story.
+2) The it seems like a majority of the features within the blanks are not very high intensity in the blanks relative to the samples. This is not true for a handful of features. 
+
+### Fold Change Filter Calibration
+
+Now I need to determine an appropriate fold change parameter. 
+
+```{r fold change parameter}
+blankData <- heat[,blankCols]
+sampleData <- heat[,-blankCols]
+double <- log1p(2)
+
+doubleCheck <- list()
+for(i in seq_along(blankCols)) {
+    #minVal <- min(blankData[,i][blankData[,i] > 0])
+    #x <- blankData[,i][blankData[,i] == 0] <- minVal
+    
+    foldChange <- apply(sampleData, 2, function(x) {
+        y <- x/blankData[,i]
+        infIndex <- is.infinite(y)
+        y[is.nan(y)] <- 0
+        
+        if(length(infIndex) > 0) {
+            y[infIndex] <- max(y[!infIndex])    
+        }
+        y
+        
+    }) %>% apply(1, max)
+    
+    hist(log(foldChange), breaks = 100, 
+         main = paste(colnames(blankData)[i], "Features Under Median Sample Intensity"))
+    abline(v = double, lty = 2)
+    
+    doubleCheck[[i]] <- foldChange > double
+}
+```
+
+I chose to check if the fold change between the max value of all the samples was used to check fold change differences because from the heatmap there appears to be sample unique peaks. The dashed line shows the log1p value returned when samples have a fold change of 2. 
+
+Something that may be worth doing is fitting a model to this and testing out if I can find a way to statistically significantly reduce the data... Talk to Gabriel.  
+
+### Applying Fold Change
+
+```{r}
+message("Difference in Retained Features Between Approaches: ", 2089 - 1242)
+solvent <- !doubleCheck[[1]]
+spe <- !doubleCheck[[2]]
+overlap <- solvent | spe
+name <- c("Count")
+knitr::kable(data.frame(Blank = name, Solvent = sum(solvent), SPE = sum(spe), 
+                        Overlap = sum(overlap), Total = length(spe)))
+
+
+omanFT <- omanFT[!overlap,]
+rm(list=setdiff(ls(), c("omanFT", "metadata", "dataCols")))
+```
+
+```{r}
+heatmap(as.matrix(omanFT[,dataCols]), main = "Feature Distribution After QA")
+omanFT <- omanFT[,!grepl("blank", colnames(omanFT), ignore.case = T)]
+```
+
+
+Lets keep the fold change filter for now. 
+
+## Writing QA Filtered Data
+
+```{r}
+write.table(omanFT, 
+            file = here("data/2018-11-23/QA_oman_feature_table.txt"),
+            row.names = F)
+```
+
