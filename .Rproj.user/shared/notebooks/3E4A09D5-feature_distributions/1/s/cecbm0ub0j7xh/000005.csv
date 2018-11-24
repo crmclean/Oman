@@ -1,3 +1,3 @@
-"0","omanFT <- read.table(here(""data/2018-11-23/QA_oman_feature_table.txt""), header = T,"
+"0","omanFT <- read.table(here::here(""data/2018-11-23/QA_oman_feature_table.txt""), header = T,"
 "0","                     stringsAsFactors = F)"
-"0","dataCols <- 3:9"
+"0","dataCols <- 3:7"

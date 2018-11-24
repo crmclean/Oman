@@ -1,3 +1,15 @@
+# 2018-11-24
+
+## Updates
+
+I made a mistake. Not all features had a calculated nominal mass. Looking at individual masses without knowing the actual structure makes it very hard to accurately define the structure. 
+
+A rough idea would be to calculate all possible adducts mass conversions, and then determine the formula for each of those. I could calibrate this with respect to the distribution of adducts for everything that has a determined exact mass. 
+
+Only 76 out of the 1200 or so masses retained has a determined exact mass. 
+
+Also, it might be worth waiting to hear what Rene has to say about this. He is much more familiar with this problem. 
+
 # 2018-11-23
 
 ## Progress

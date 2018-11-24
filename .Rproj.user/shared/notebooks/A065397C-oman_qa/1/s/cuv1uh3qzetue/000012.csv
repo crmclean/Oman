@@ -1,0 +1,2 @@
+"0","omanFT[,dataCols] <- log1p(intensityTable)"
+"0","rm(x, intensityTable)"

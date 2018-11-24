@@ -16,4 +16,13 @@ Oman.Rproj	bin		data		docs		results		scr
 ]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ mkdir [K[K[Kaydir 
 ]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ ls
 2018-11-22	2018-11-23
-]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ [KCraigs-MacBook-Pro-2:data craigmclean$ 
+]0;~/MIT/Research/Oman/data[?1034hCraigs-MBP-2:data craigmclean$ [KCraigs-MBP-2:data craigmclean$ ls
+2018-11-22	2018-11-23
+]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ pwd
+/Users/craigmclean/MIT/Research/Oman/data
+]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ ls
+2018-11-22	2018-11-23
+]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ mkdaydir 
+]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ ls
+2018-11-22	2018-11-23	2018-11-24
+]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ 

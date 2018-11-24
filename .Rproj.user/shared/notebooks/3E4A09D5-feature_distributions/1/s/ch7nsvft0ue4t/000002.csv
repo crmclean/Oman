@@ -1,3 +1,6 @@
-"0","library(limma)
-"
-"2","package ‘limma’ was built under R version 3.4.3"
+"0","library(dplyr)"
+"0","library(ggplot2)"
+"0","library(here)"
+"0","library(limma)"
+"0","library(RColorBrewer)"
+"0","library(ggbiplot)"

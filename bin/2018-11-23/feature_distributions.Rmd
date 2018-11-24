@@ -11,6 +11,7 @@ library(ggplot2)
 library(here)
 library(limma)
 library(RColorBrewer)
+library(ggbiplot)
 ```
 
 # Visualizing Features From Data
@@ -20,7 +21,7 @@ The goal of this file is to get an idea of how the features are distributed betw
 ## Analysis
 
 ```{r loading Data}
-omanFT <- read.table(here("data/2018-11-23/QA_oman_feature_table.txt"), header = T,
+omanFT <- read.table(here::here("data/2018-11-23/QA_oman_feature_table.txt"), header = T,
                      stringsAsFactors = F)
 dataCols <- 3:7
 ```
@@ -46,13 +47,22 @@ The same pattern holds, and is not as big numerically as the heatmap makes it se
 
 ### Intensity Differences
 
-Get a PCA done here, this will incorporate intensity into the differences.
+Before doing a larger feature selection to integrate how intensity could contribute to differences between the samples selected, I need to try to give things chemical formulas. Hopefully I can use the formulas as predictors for a random forest later.  
 
 ```{r}
-## also think about pasting mz_rt as single variable.
+mOz <- omanFT$Neutral_Mass[order(omanFT$Neutral_Mass)]
+abs_abu <- omanFT[order(omanFT$Neutral_Mass),dataCols] %>% apply(1, max)
 
-plot(princomp(omanFT[,dataCols]))
+formTable <- data.frame(mz = as.character(mOz), abs_abu = as.character(abs_abu), stringsAsFactors = F)
+nonNaFormTable <- formTable[!is.na(formTable$mz),]
+
+write.table(x = nonNaFormTable, row.names = F, sep = "\t",
+            file = here::here("data/2018-11-24/formularity_table.txt"),
+            quote = F)
+
+
 ```
+
 
 Think about doing some kind of feature selection 
 

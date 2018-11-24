@@ -1,0 +1,19 @@
+
+dataPath <- "data/2017-11-11/processed_data/neg/FP"
+dataFile <- list.files(dataPath, recursive = T, pattern = "*.csv")
+completePath <- file.path(dataPath, dataFile) 
+dataList <- lapply(completePath, read.csv)
+
+CIAList <- lapply(dataList, function(d_list) {
+  maxIntensity <-d_list %>% select(contains("mmetsp")) %>% apply(1, max)
+  mz <- d_list %>% select(mz)
+  newTable <- cbind(mz, maxIntensity)
+})
+
+CIAnames <- dataFile %>% 
+  sub(".*/", "", .) %>% 
+  sub(".csv", "", .) %>% 
+  paste0(., "CIA", ".csv")
+lapply(1:length(CIAList), function(listIndex) {
+  write.csv(x = CIAList[[listIndex]], file = CIAnames[listIndex])
+})
