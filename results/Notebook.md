@@ -1,4 +1,28 @@
+# 2018-11-27
+
+## New Plan
+
+### Issues w/ Previous Plan
+From speaking with Krista, we cannot do the formula assignment strategy. She says that there are far too many combinations with the instrument they used to really make any sense of what they have. 
+
+### Proposed Approach
+
+New plan: create a classifier to identify which features are distinctive to each well. From what I see, there appears to be one well that is far different than the others, so I hypothesize that this should contain distinguishing traits from the other two. 
+
+### To Do
+
+I need to run a random forest on the dataset to see if there are specific features that distinguish one feature from another. To do this I will first:
+
+1) Follow a tutorial on how to do this from the internet
+2) Apply it to my data
+3) Interpret the results of the analysis to see if there are any distinctive propoerties about the random forest features.
+4) I should match features to m/z putative ID matches from the other sheet Lauren gave me. 
+
 # 2018-11-24
+
+## To Do
+
+I need to check out the new formularity paper to see how the scoring and isotope functions work. I got the algorithm to work and show a lot of masses if I use a high ppm filter.  
 
 ## Updates
 
