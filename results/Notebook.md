@@ -1,3 +1,12 @@
+# 2018-12-02
+
+The current state of affairs: I have a meeting w/ ethan from the Alm lab to discuss the use of different ML tools to solve my classification issue. Alternatively, I could also speak w/ Rohan. 
+
+My current idea is to use:
+- A decision tree
+- All-vs-all random forest
+- logistic regression
+
 # 2018-11-27
 
 ## New Plan

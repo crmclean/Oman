@@ -1,3 +1,0 @@
-"0","write.table(omanFT, "
-"0","            file = here(""data/2018-11-23/QA_oman_feature_table.txt""),"
-"0","            row.names = F)"

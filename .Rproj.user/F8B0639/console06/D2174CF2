@@ -25,4 +25,16 @@ Oman.Rproj	bin		data		docs		results		scr
 ]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ mkdaydir 
 ]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ ls
 2018-11-22	2018-11-23	2018-11-24
+]0;~/MIT/Research/Oman/data[?1034hCraigs-MBP-2:data craigmclean$ ls
+2018-11-22	2018-11-23	2018-11-24
+]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ cd ../
+]0;~/MIT/Research/OmanCraigs-MBP-2:Oman craigmclean$ ls
+Oman.Rproj	bin		data		docs		results		scr
+]0;~/MIT/Research/OmanCraigs-MBP-2:Oman craigmclean$ pwd
+/Users/craigmclean/MIT/Research/Oman
+]0;~/MIT/Research/OmanCraigs-MBP-2:Oman craigmclean$ cd data/
+]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ mkdaydir 
+]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ ls
+2018-11-22	2018-11-23	2018-11-24	2018-11-27
+]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ c[Kopen 2018-11-28[K7
 ]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ 

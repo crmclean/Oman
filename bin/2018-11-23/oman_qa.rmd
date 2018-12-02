@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 library(dplyr)
 library(here)
+library(corrplot)
 ```
 
 # Goal
@@ -154,5 +155,9 @@ Lets keep the fold change filter for now.
 write.table(omanFT, 
             file = here("data/2018-11-23/QA_oman_feature_table.txt"),
             row.names = F)
+
+omanFT[,3:7] %>% apply(2, function(col) {sum(col == 0)/length(col)})
+
+omanFT[,3:7] %>% as.matrix() %>% t() %>% cor() %>% corrplot()
 ```
 
