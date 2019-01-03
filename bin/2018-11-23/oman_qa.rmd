@@ -28,11 +28,11 @@ dataCols <- list()
 for(i in 1:nrow(metadata)) {
     dataCols[[i]] <- grep(metadata$Sample_Name[i],colnames(omanFT))[1]
 }
-colnames(omanFT)[c(2,5)] <- c("Neutral_Mass", "Retention_Time")
+colnames(omanFT)[c(3,5)] <- c("mz", "Retention_Time")
 omanFT$Retention_Time <- omanFT$Retention_Time * 60
 
 ## consider
-omanFT <- omanFT[,c(2,5, unlist(dataCols))]
+omanFT <- omanFT[,c(3,5, unlist(dataCols))]
 dataCols <- grep("XS1", colnames(omanFT))
 colnames(omanFT)[dataCols] <- metadata$Sample_Type[which(metadata$Sample_Name %in% 
                                                            colnames(omanFT)[dataCols])]
@@ -152,12 +152,11 @@ Lets keep the fold change filter for now.
 ## Writing QA Filtered Data
 
 ```{r}
+zeroRows <- rowSums(omanFT[,grep("-", colnames(omanFT))]) > 0
+omanFT <- omanFT[zeroRows,]
+
 write.table(omanFT, 
             file = here("data/2018-11-23/QA_oman_feature_table.txt"),
             row.names = F)
-
-omanFT[,3:7] %>% apply(2, function(col) {sum(col == 0)/length(col)})
-
-omanFT[,3:7] %>% as.matrix() %>% t() %>% cor() %>% corrplot()
 ```
 

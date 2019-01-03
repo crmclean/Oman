@@ -1,1 +1,1 @@
-"0","heatmap(as.matrix(omanFT[,dataCols]), main = ""Feature Distribution After QA"")"
+"0","omanFT <- omanFT[,!grepl(""blank"", colnames(omanFT), ignore.case = T)]"

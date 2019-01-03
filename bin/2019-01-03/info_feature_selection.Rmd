@@ -1,0 +1,135 @@
+---
+title: "Information Gain on Metabolomics"
+author: "Craig McLean"
+date: "1/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(here)
+```
+
+# Overview
+
+I need to do some kind of feature selection to find features that are 
+distinctive to each well. I think the play here is to look at information gain.
+
+Information gain is the same parameter used by decision tree models for their
+feature selection branch points. 
+
+```{r reading in data}
+omanFT <- read.table(here::here("data/2018-11-23/QA_oman_feature_table.txt"), header = T,
+                     stringsAsFactors = F)
+dataCols <- 3:7
+```
+
+```{r calculating entropy}
+dataMatrix <- omanFT[,grep("\\.", colnames(omanFT))] 
+
+dataMatrix <- dataMatrix/rowSums(dataMatrix)
+
+dataMatrix$entropy <- apply(dataMatrix, 1, function(row) {
+    
+    if(any(row == 0)) {
+        row <- row[row != 0]
+    }
+    return(-sum(row * log2(row)))
+    
+})
+hist(dataMatrix$entropy, main = "Feature Entropy Distribution",
+     xlab = "Information Entropy",
+     breaks = 50)
+```
+
+I will use information gain per sample to determine how much each sample contributes towards the data.
+
+```{r calculating information gain}
+sampleFeatureEntropy <- apply(dataMatrix[,-6], 1, function(row) {
+    if(any(row == 0)) {
+        row <- row[row > 0]
+    }
+    p <- row/sum(row)
+    return(-p*log2(p))
+})
+
+infoGain <- vector(mode = "numeric", length = length(sampleFeatureEntropy))
+for(i in seq_along(sampleFeatureEntropy)) {
+    
+    curRow <- sampleFeatureEntropy[[i]]
+    
+    # case when only one feature makes up the group
+    if(dataMatrix$entropy[i] == 0) {
+        infoGain[i] <- 0
+    } else {
+        infoGain[i] <- dataMatrix$entropy[i] - sum(curRow)/length(curRow)
+    }
+}
+
+infoGain %>% hist(breaks = 30, main = "Information Gain Per Feature",
+                  xlab = "Information Gain")
+```
+
+I will choose to use .5 as a threshold since it represents only .5 bits of informaiton
+required to store the different options available. 
+
+```{r}
+selectedFeatures <- infoGain <= 0.5
+message("Total number of retained features: ", sum(selectedFeatures))
+```
+
+I will assign a feature to a sample by giving it to the sample with the lowest 
+self information. 
+
+```{r}
+minEntropyId <- sapply(sampleFeatureEntropy[selectedFeatures], function(groups) {
+    names(groups)[which.min(groups)]
+}) 
+table(minEntropyId)
+```
+
+There is an issue here. I cant use the neutral mass column since a good amount of
+the values were not computed. I need to link this to another column within the 
+original data sheet that contains m/z values. Due to coellution of features
+I had to go back to the original clean up to accomplish this. 
+
+```{r}
+selectedData <- omanFT[selectedFeatures,]
+selectedData$classifier <- minEntropyId
+
+compoundDb <- read.csv(here::here("data/2018-11-22/OM17compoundIDs.csv"),
+         header = T, skip = 0)
+
+obsFeatures <- paste(signif(compoundDb$m.z), 
+                     signif(compoundDb$Retention.time..min. * 60), sep = "_")
+
+infoFeatures <- paste(signif(selectedData$mz), 
+      signif(selectedData$Retention_Time),
+      sep = "_")
+
+matchedFeatures <- lapply(infoFeatures, function(curFeat) {
+    which(curFeat == obsFeatures)
+})
+
+compoundIds <- list()
+for(i in seq_along(matchedFeatures)) {
+    
+    if(length(matchedFeatures[[i]]) == 0) {
+        next 
+    } else {
+        retainRows <- matchedFeatures[[i]]
+    }
+    
+    compoundIds[[i]] <- compoundDb[retainRows,] %>% 
+        select(Adducts, Formula, Score, Fragmentation.Score,
+               Mass.Error..ppm., Description, m.z, Retention.time..min.) %>% 
+        mutate(infoRow = i)
+    
+}
+matchedCompounds <- Reduce(f = rbind, compoundIds)
+write.table(x = selectedData, row.names = F, 
+            file = here("data/2019-01-03/highInfoFeatures.txt"))
+write.table(x = matchedCompounds, row.names = F, 
+            file = here("data/2019-01-03/highInfoCpdMatches.txt"))
+```
+

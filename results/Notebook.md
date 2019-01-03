@@ -1,3 +1,7 @@
+# 2019-01-03
+
+The algorithm I need to use for this project is an IDS3 information tree model that makes decisions based on the entropy of each row of features. Conceptually a low entropy is ideal since it has the most predictive power. 
+
 # 2018-12-02
 
 The current state of affairs: I have a meeting w/ ethan from the Alm lab to discuss the use of different ML tools to solve my classification issue. Alternatively, I could also speak w/ Rohan. 

@@ -37,4 +37,10 @@ Oman.Rproj	bin		data		docs		results		scr
 ]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ ls
 2018-11-22	2018-11-23	2018-11-24	2018-11-27
 ]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ c[Kopen 2018-11-28[K7
-]0;~/MIT/Research/Oman/dataCraigs-MBP-2:data craigmclean$ 
+]0;~/MIT/Research/Oman/data[?1034hCraigs-MacBook-Pro-2:data craigmclean$ ls
+2018-11-22	2018-11-23	2018-11-24	2018-11-27
+]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ source ~/.bash_profilek[K
+]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ mkdaydir 
+]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ ls 2019-01-03/
+highInfoCpdMatches.txt	highInfoFeatures.txt
+]0;~/MIT/Research/Oman/dataCraigs-MacBook-Pro-2:data craigmclean$ 
