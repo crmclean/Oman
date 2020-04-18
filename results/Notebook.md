@@ -1,5 +1,11 @@
 # 2019-01-03
 
+## Update
+
+I did the feature selection algo within a directory with todays date in the bin folder. I also updated the github and sent the links to lauren. I'm just going to wait and see what else she has in mind for this paper. 
+
+## Plan
+
 The algorithm I need to use for this project is an IDS3 information tree model that makes decisions based on the entropy of each row of features. Conceptually a low entropy is ideal since it has the most predictive power. 
 
 # 2018-12-02
