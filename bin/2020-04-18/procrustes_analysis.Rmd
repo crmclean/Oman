@@ -1,0 +1,131 @@
+---
+title: "Digging through Bins"
+author: "Craig McLean"
+date: "4/18/2020"
+output: html_document
+---
+
+# aims
+
+The goal of this file is to find some sort of enrichment profile to use
+to mine the metabolite data.
+
+```{r, loading everything in}
+options(stringsAsFactors = F)
+binRelFrac <- read.table(file = here::here("data/2020-04-17/Oman.RelativeFraction.tsv"))
+binRpkm <- read.table(file = here::here("data/2020-04-17/Oman.RPKM.tsv"))
+binQuality <- read.csv(here::here("data/2020-04-17/bin_quality_stats.csv"))
+binQuality <- binQuality[!is.na(binQuality$Completeness),]
+mtabData <- read.table(here::here("data/2018-11-23/QA_oman_feature_table.txt"), header = T)
+taxonomy <- read.csv(here::here("data/2020-04-12/Oman_bins_taxa.csv"))
+```
+
+From Lauren's email, I know we only collected mtabs for well NSHQ14B, not C
+
+```{r filtering gene data to only consider wells w/ mtab data}
+wells <- sub("\\.", "", colnames(mtabData)[-c(1:2)])
+wells[1] <- paste0(wells[1],"B")
+binRelFrac <- binRelFrac[,colnames(binRelFrac) %in% wells]
+binRpkm <- binRpkm[,colnames(binRpkm) %in% wells]
+
+```
+
+I'm keeping bins with completeness at least of 50 percent as per Lauren's email
+
+```{r filtering the data for quality}
+binQuality <- binQuality[binQuality$Completeness > 50,]
+binQuality <- binQuality[binQuality$Contamination < 50,]
+
+binRpkm <- binRpkm[rownames(binRpkm) %in% binQuality$Bin.ID,]
+binRelFrac <- binRelFrac[rownames(binRelFrac) %in% binQuality$Bin.ID,]
+
+taxonomy <- taxonomy[taxonomy$Bin.Id %in% gsub("-", "_", binQuality$Bin.ID),]
+
+```
+
+Doing an NMF on the bins
+
+```{r calibrating NMF}
+library(NMF)
+
+if(FALSE) {
+    res <- nmfEstimateRank(as.matrix(binRelFrac), seq(2,5), method='brunet', 
+                       nrun=100, 
+                       seed=123456)
+    rV <- randomize(as.matrix(binRelFrac))
+    rand <- nmfEstimateRank(rV[rowSums(rV) > 0,], seq(2,5), 
+                            method='brunet', 
+                            nrun=100, 
+                            seed=123456)
+    
+    png(filename = here::here("results/2020-04-18/metagenomes_bin_cophenetic_cor.png"),
+        width = 6.5, height = 5, res = 300, units = "in")
+    plot(res, rand)
+    dev.off()
+}
+```
+
+k = 2 appears to be the answer
+
+```{r doing NMF}
+nmfOut <- nmf(as.matrix(binRelFrac), rank = 2)
+
+wMatrix <- basis(nmfOut)
+   
+keyFeatures <- extractFeatures(nmfOut, method = 0.99)
+linkedFactors <- apply(coef(nmfOut), 1, function(row) {
+    row > 0.01
+})
+ 
+nmfOut2 <- nmf(as.matrix(mtabData[,-c(1:2)]), rank = 2)
+keyFeatures <- extractFeatures(nmfOut, method = 0.99)
+apply(coef(nmfOut2), 1, function(row) {
+    row > 0.01
+})
+apply(coef(nmfOut), 1, function(row) {
+    row > 0.01
+})
+
+#heatmap(wMatrix)
+```
+
+Look up some transformations that apply to PCAs. Eg - hellinger transforms.
+
+Check out the meaning of symmetric withing the calculation of stretching stat.
+
+```{r}
+suppressPackageStartupMessages(library(vegan))
+suppressPackageStartupMessages(library(ade4))
+
+
+## ---- PCS FOR METABOLITES
+## standardizing data and geting pcs 
+mtab.std <- decostand(t(mtabData[,-c(1,2)]), method = "standardize")
+pca.mtab <- rda(mtab.std)
+plot(pca.mtab, scaling = 1, display = "sites", type = "text", 
+     main = "PCA for Mtab Data")
+
+## ---- PCS FOR BINS
+## standardizing data and geting pcs 
+bins.hel <- decostand(t(binRpkm), method = "hellinger")
+pca.bins <- rda(bins.hel)
+plot(pca.bins, scaling = 1, display = "sites", type = "text", 
+     main = "PCA for Species Data")
+
+pro <- procrustes(X = pca.mtab, Y = pca.bins, symmetric = TRUE)
+pro
+
+png(filename = here::here("results/2020-04-18/gene_mtab_procrustes.png"), 
+    width = 6, height = 5,units = "in", res = 300)
+par(bty = "n", las = 1)
+plot(pro, kind = 1, type = "text", main = "Procrustes Analysis of Mtabs and Bins")
+dev.off()
+```
+
+Significance testing of analysis
+
+```{r}
+protest(X = pca.mtab, Y = pca.bins, scores = "sites", permutations = 100)
+```
+
+
