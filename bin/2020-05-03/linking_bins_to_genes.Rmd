@@ -1,0 +1,106 @@
+---
+title: "Feature Selection of Combined Datasets"
+author: "Craig McLean"
+date: "5/3/2020"
+output: html_document
+---
+
+Observation:
+
+From the procrustes analysis, there appears to be three clusters related to 
+distinct wells. 
+
+Plan:
+
+1) I'll run an NMF on both datasets
+2) I'll select features from bins first (look for organisms driving change)
+3) I'll look for pathways that make these organisms distinct
+4) I'll look for evidence of each pathway within metabolites NMF profiles from
+each well
+
+# \Filtering Genomics Data
+
+```{r loading data}
+bins <- read.csv(here::here("data/2020-05-03/bin_rpkm_filtered.csv"))
+taxa <- read.csv(here::here("data/2020-05-03/bin_taxons_filtered.csv"))
+```
+
+```{r}
+library(NMF)
+binNMF <- nmf(x = as.matrix(bins[,-1]), rank = 3)
+  
+keyFeatures <- extractFeatures(binNMF, method = 0.99)
+linkedFactors <- apply(coef(binNMF), 1, function(row) {
+    row > 0.01
+})
+print(linkedFactors)
+rm(linkedFactors, binNMF)
+```
+
+distribution of samples across rank space of NMF
+2) NSHQ14 and WAB71
+1) WAB55
+3) WAB105 and WAB 104
+
+The order is not set in stone
+
+```{r Learning key taxons}
+nshq <- bins[keyFeatures[[1]],1]
+wab55 <- bins[keyFeatures[[2]],1]
+wab105 <- bins[keyFeatures[[3]],1]
+
+taxa$keyWell <- ""
+taxa$keyWell[taxa$Bin.Id %in% gsub("-", "_", nshq)] <- "nshq"
+taxa$keyWell[taxa$Bin.Id %in% gsub("-", "_", wab55)] <- "wab55"
+taxa$keyWell[taxa$Bin.Id %in% gsub("-", "_", wab105)] <- "wab105"
+taxa <- taxa[taxa$keyWell != "",]
+
+write.csv(taxa, file = here::here("data/2020-05-03/key_well_taxa.csv"),
+          row.names = F)
+rm(wab105,wab55, nshq, keyFeatures, bins)
+```
+
+# Pathways for key microbes
+
+```{r loading Gene data}
+binKos <- read.csv(here::here("data/2020-04-12/Oman_bins_kos.csv"),
+                   stringsAsFactors = F)
+
+# filtering data to only consider key bins
+binKos <- binKos[,c(1:5,which(colnames(binKos) %in% taxa$Bin.Id))]
+binKos <- binKos[!is.na(binKos$Metabolism),]
+binKos <- binKos[!duplicated(binKos$KO_ID),]
+binKos[is.na(binKos)] <- 0
+
+count <- t(binKos[,-c(1:5)])
+colnames(count) <- binKos$KO_ID
+count[count > 1] <- 1
+count <- as.data.frame(count)
+count$well <- taxa$keyWell
+#count$well[count$well != "nshq"] <- "other"
+count$well <- as.factor(count$well)
+
+```
+
+
+I think a random forrest could be used to identify genes that seperate the types of wells
+
+```{r}
+library(randomForest)
+require(caTools)
+
+
+pc <- princomp(t(count[,-ncol(count)]))
+
+plot(pc$scores[,5],pc$scores[,4])
+
+rf <- randomForest(
+  
+    # denotes what I'm actually predicting for
+    well ~ .,
+    data=count,
+    importance = T
+)
+
+```
+

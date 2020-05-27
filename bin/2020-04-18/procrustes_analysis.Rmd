@@ -41,6 +41,9 @@ binRelFrac <- binRelFrac[rownames(binRelFrac) %in% binQuality$Bin.ID,]
 
 taxonomy <- taxonomy[taxonomy$Bin.Id %in% gsub("-", "_", binQuality$Bin.ID),]
 
+write.csv(binRpkm, file = here::here("data/2020-05-03/bin_rpkm_filtered.csv"))
+write.csv(taxonomy, file = here::here("data/2020-05-03/bin_taxons_filtered.csv"),
+          row.names = F)
 ```
 
 Doing an NMF on the bins
@@ -128,4 +131,6 @@ Significance testing of analysis
 protest(X = pca.mtab, Y = pca.bins, scores = "sites", permutations = 100)
 ```
 
-
+Hellinger transformation appears to be an appropriate choice given the fact that metagenomics data is
+a) compositional
+b) has lots of zeros

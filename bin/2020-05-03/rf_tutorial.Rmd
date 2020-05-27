@@ -1,0 +1,81 @@
+---
+title: "Random Forest Tutorial"
+author: "Craig McLean"
+date: "5/3/2020"
+output: html_document
+---
+
+# random forest tutorial
+
+https://towardsdatascience.com/random-forest-in-r-f66adf80ec9
+
+```{r}
+library(randomForest)
+require(caTools)
+```
+
+```{r}
+data <- read.csv(
+  here::here("data/2020-05-03/rf_tutorial/processed.cleveland.data"),
+  header=FALSE
+)
+names(data) <- c("age", "sex", "cp", "trestbps", "choi", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thai", "num")
+head(data)
+
+# making everything bianary
+data$num[data$num > 1] <- 1
+```
+
+```{r turning things to factors}
+data <- transform(
+  data,
+  age=as.integer(age),
+  sex=as.factor(sex),
+  cp=as.factor(cp),
+  trestbps=as.integer(trestbps),
+  choi=as.integer(choi),
+  fbs=as.factor(fbs),
+  restecg=as.factor(restecg),
+  thalach=as.integer(thalach),
+  exang=as.factor(exang),
+  oldpeak=as.numeric(oldpeak),
+  slope=as.factor(slope),
+  ca=as.factor(ca),
+  thai=as.factor(thai),
+  num=as.factor(num)
+)
+
+# replacing missing values in the data
+data[ data == "?"] <- NA
+data$thai[which(is.na(data$thai))] <- as.factor("3.0")
+data <- data[!(data$ca %in% c(NA)),]
+
+data$ca <- factor(data$ca)
+data$thai <- factor(data$thai)
+```
+
+```{r spliting data to make model}
+sample = sample.split(data$num, SplitRatio = .75)
+train = subset(data, sample == TRUE)
+test  = subset(data, sample == FALSE)
+```
+
+```{r random forrest}
+rf <- randomForest(
+  
+    # denotes what I'm actually predicting for
+    num ~ .,
+    data=train,
+    importance = T
+)
+
+rf$importance
+
+pred = predict(rf, newdata=test[-14])
+```
+
+```{r evaluating model performance}
+cm = table(test[,14], pred)
+```
+
+
